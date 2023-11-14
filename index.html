@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enregistrement de Nombre</title>
+</head>
+<body>
+  <form id="numberForm">
+    <label for="inputNumber">Entrez un nombre :</label>
+    <input type="number" id="inputNumber" name="inputNumber" required>
+    <button type="button" onclick="submitNumber()">Enregistrer</button>
+  </form>
+
+  <script>
+    function submitNumber() {
+      // Récupérer la valeur du champ d'entrée
+      const number = document.getElementById('inputNumber').value;
+
+      // Envoyer la valeur au serveur (vous devrez implémenter cette partie)
+      // Utilisez par exemple XMLHttpRequest, Fetch API ou Axios pour effectuer une requête au serveur.
+    }
+  </script>
+</body>
+</html>
