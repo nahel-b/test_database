@@ -6,20 +6,28 @@
   <title>Enregistrement de Nombre</title>
 </head>
 <body>
-  <form id="numberForm">
-    <label for="inputNumber">Entrez un nombre :</label>
-    <input type="number" id="inputNumber" name="inputNumber" required>
-    <button type="button" onclick="submitNumber()">Enregistrer</button>
+  <h1>Entrez un nombre :</h1>
+  <form id="nombreForm">
+    <input type="number" id="nombreInput" required>
+    <button type="submit">Envoyer</button>
   </form>
 
   <script>
-    function submitNumber() {
-      // Récupérer la valeur du champ d'entrée
-      const number = document.getElementById('inputNumber').value;
+    document.getElementById('nombreForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      const nombre = document.getElementById('nombreInput').value;
 
-      // Envoyer la valeur au serveur (vous devrez implémenter cette partie)
-      // Utilisez par exemple XMLHttpRequest, Fetch API ou Axios pour effectuer une requête au serveur.
-    }
+      fetch('/enregistrerNombre', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ nombre }),
+      })
+      .then(response => response.text())
+      .then(message => alert(message))
+      .catch(error => console.error(error));
+    });
   </script>
 </body>
 </html>
