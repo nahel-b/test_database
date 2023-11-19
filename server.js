@@ -17,6 +17,10 @@ const Nombre = mongoose.model('Nombre', nombreSchema);
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/index.html');
+});
+
 app.post('/enregistrerNombre', (req, res) => {
   const nombre = req.body.nombre;
 
