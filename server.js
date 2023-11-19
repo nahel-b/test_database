@@ -5,8 +5,11 @@ const mongoose = require('mongoose');
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Configuration de MongoDB (assurez-vous que MongoDB est installé localement ou configurez une base de données en ligne)
-mongoose.connect('mongodb://localhost:27017/votre_base_de_donnees', { useNewUrlParser: true, useUnifiedTopology: true });
+// Configuration de MongoDB Atlas (remplacez <votre_identifiant> et <votre_mot_de_passe> par vos informations)
+mongoose.connect('mongodb+srv://test:${mdpMongoTest}@cluster0.vec7cmf.mongodb.net/votre_base_de_donnees', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+});
 
 const nombreSchema = new mongoose.Schema({
   valeur: Number
@@ -42,5 +45,5 @@ app.post('/enregistrerNombre', (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Serveur en cours d'exécution sur le port ${port}`);
+  console.log(`Server running on port ${port}`);
 });
