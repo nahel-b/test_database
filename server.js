@@ -5,8 +5,11 @@ const mongoose = require('mongoose');
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Configuration de MongoDB Atlas (remplacez <votre_identifiant> et <votre_mot_de_passe> par vos informations)
-mongoose.connect('mongodb+srv://test:${mdpMongoTest}@cluster0.vec7cmf.mongodb.net/votre_base_de_donnees', {
+// Utilisez la variable d'environnement pour le mot de passe
+const mdpMongoTest = process.env.mdpMongoTest;
+
+// Configuration de MongoDB Atlas
+mongoose.connect(`mongodb+srv://test:${mdpMongoTest}@cluster0.vec7cmf.mongodb.net/app_liste`, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 });
