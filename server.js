@@ -24,6 +24,31 @@ client.connect()
   })
   .catch(err => console.error('Erreur de connexion à MongoDB Atlas', err));
 
+function log(string ) {
+  console.log("[APP]" + string);  
+}
+
+
+const rateLimit = require("express-rate-limit");
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // 5 tentatives maximum par fenêtre
+  handler: (req, res) => {
+    res.status(429).json({
+      error: 'Trop de tentatives à partir de cette adresse IP. Veuillez réessayer après 15 minutes.'
+    });
+  }
+});
+app.post('/signup', limiter, async (req, res) => {
+  //log le nom d'utilisateur qui a dépassé la limite
+  log(req.session.utilisateur.usernam + " a dépassé la limite de tentatives de connexion");
+});
+
+
+
+
+
 // Route pour la page d'accueil
 app.get('/', (req, res) => {
   if (req.session.utilisateur) {
@@ -62,12 +87,19 @@ app.get('/signup', (req, res) => {
 app.post('/signup', async (req, res) => {
   const { username, password } = req.body;
 
+
+  // Vérifiez si l'utilisateur existe déjà dans la base de données
+  const utilisateur = await chercherUtilisateur(username);
+  if(utilisateur) {
+    return res.render('signup', { erreur: 'Nom d\'utilisateur déjà utilisé' });
+  }
+
   // Hachez le mot de passe avant de le stocker dans la base de données
   const hash = await bcrypt.hash(password, 10);
 
   // Enregistrez les nouvelles informations d'identification dans la base de données
   await db.collection('utilisateurs').insertOne({ username, password: hash });
-
+  log("Nouvel utilisateur: " + username);
   res.redirect('/login');
 });
 
