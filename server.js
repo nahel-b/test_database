@@ -33,7 +33,7 @@ const rateLimit = require("express-rate-limit");
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // 5 tentatives maximum par fenêtre
+  max: 50, // 5 tentatives maximum par fenêtre
   handler: (req, res) => {
     res.status(429).json({
       error: 'Trop de tentatives à partir de cette adresse IP. Veuillez réessayer après 15 minutes.'
@@ -42,7 +42,13 @@ const limiter = rateLimit({
 });
 app.post('/signup', limiter, async (req, res) => {
   //log le nom d'utilisateur qui a dépassé la limite
-  log(req.session.utilisateur.usernam + " a dépassé la limite de tentatives de connexion");
+  if (req.session.utilisateur) {
+    log(req.session.utilisateur.usernam + " a dépassé la limite de tentatives de connexion");
+  }
+  else {
+    log("Quelqu'un a dépassé la limite de tentatives de connexion");
+  }
+ 
 });
 
 
