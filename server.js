@@ -52,7 +52,7 @@ app.post('/login', async (req, res) => {
 
 // Route pour la page d'inscription
 app.get('/signup', (req, res) => {
-  res.render('signup');
+  res.render('signup', { erreur: null });
 });
 
 // Route pour gérer l'inscription
