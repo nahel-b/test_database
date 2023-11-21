@@ -1,42 +1,88 @@
 const express = require('express');
+const session = require('express-session');
 const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
+const { MongoClient } = require('mongodb');
+require('dotenv').config();
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Configuration de MongoDB (assurez-vous que MongoDB est installé localement ou configurez une base de données en ligne)
-mongoose.connect('mongodb://localhost:27017/votre_base_de_donnees', { useNewUrlParser: true, useUnifiedTopology: true });
-
-const nombreSchema = new mongoose.Schema({
-  valeur: Number
-});
-
-const Nombre = mongoose.model('Nombre', nombreSchema);
-
+// Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(session({ secret: process.env.SESSION_SECRET, resave: true, saveUninitialized: true }));
+app.set('view engine', 'ejs');
 
-app.post('/enregistrerNombre', (req, res) => {
-  const nombre = req.body.nombre;
+// Connecter à MongoDB Atlas
+const client = new MongoClient(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+let db;
 
-  // Vérifie si le nombre est supérieur à 8
-  if (nombre > 8) {
-    const nouveauNombre = new Nombre({ valeur: nombre });
+client.connect()
+  .then(() => {
+    console.log('Connecté à MongoDB Atlas');
+    db = client.db();
+  })
+  .catch(err => console.error('Erreur de connexion à MongoDB Atlas', err));
 
-    // Enregistre le nombre dans la base de données
-    nouveauNombre.save((err) => {
-      if (err) {
-        return res.status(500).send(err);
-      }
-
-      return res.status(200).send('Nombre enregistré avec succès !');
-    });
+// Route pour la page d'accueil
+app.get('/', (req, res) => {
+  if (req.session.utilisateur) {
+    res.render('accueil', { username: req.session.utilisateur.username });
   } else {
-    return res.status(200).send('Le nombre n\'est pas supérieur à 8, donc non enregistré.');
+    res.redirect('/login');
   }
 });
 
-app.listen(port, () => {
-  console.log(`Serveur en cours d'exécution sur le port ${port}`);
+// Route pour la page de connexion
+app.get('/login', (req, res) => {
+  res.render('login', { erreur: null });
 });
+
+// Route pour gérer la connexion
+app.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+
+  // Vérifiez les informations d'identification dans la base de données
+  const utilisateur = await chercherUtilisateur(username);
+
+  if (utilisateur && await bcrypt.compare(password, utilisateur.password)) {
+    req.session.utilisateur = { id: utilisateur._id, username: utilisateur.username };
+    res.redirect('/');
+  } else {
+    res.render('login', { erreur: 'Nom d\'utilisateur ou mot de passe incorrect' });
+  }
+});
+
+// Route pour la page d'inscription
+app.get('/signup', (req, res) => {
+  res.render('signup', { erreur: null });
+});
+
+// Route pour gérer l'inscription
+app.post('/signup', async (req, res) => {
+  const { username, password } = req.body;
+
+  // Hachez le mot de passe avant de le stocker dans la base de données
+  const hash = await bcrypt.hash(password, 10);
+
+  // Enregistrez les nouvelles informations d'identification dans la base de données
+  await db.collection('utilisateurs').insertOne({ username, password: hash });
+
+  res.redirect('/login');
+});
+
+// Route pour la déconnexion
+app.get('/logout', (req, res) => {
+  req.session.destroy();
+  res.redirect('/');
+});
+
+// Écoutez le port
+app.listen(port, () => {
+  console.log(`Serveur en cours d'exécution sur http://localhost:${port}`);
+});
+
+// Fonction pour chercher un utilisateur dans la base de données
+function chercherUtilisateur(username) {
+  return db.collection('utilisateurs').findOne({ username });
+}
