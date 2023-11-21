@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    canvas {
+      border: 1px solid #000;
+    }
+  </style>
+  <title>Flappy Bird</title>
+</head>
+<body>
+  <canvas id="flappyBirdCanvas"></canvas>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const canvas = document.getElementById("flappyBirdCanvas");
+      const context = canvas.getContext("2d");
+
+      const aspectRatioThreshold = 1.5; // Facteur largeur/hauteur à partir duquel le canvas sera centré
+
+      // Ajuster la taille du canvas pour qu'il soit rectangulaire et occupe tout l'écran
+      const screenWidth = window.innerWidth;
+      const screenHeight = window.innerHeight;
+      const aspectRatio = 3 / 4; // Aspect ratio choisi pour le canvas (hauteur / largeur)
+      let canvasWidth, canvasHeight;
+
+      if (screenWidth / screenHeight > aspectRatioThreshold) {
+        // Si l'écran est suffisamment large, ajuster la largeur et la hauteur du canvas en conséquence
+        canvasHeight = screenHeight;
+        canvasWidth = screenHeight * aspectRatio;
+      } else {
+        // Si l'écran n'est pas assez large, prendre toute la largeur de l'écran
+        canvasWidth = screenWidth;
+        canvasHeight = screenWidth / aspectRatio;
+      }
+
+      canvas.width = canvasWidth;
+      canvas.height = canvasHeight;
+
+      const bird = {
+        x: 50,
+        y: canvas.height / 2 - 15,
+        width: 30,
+        height: 30,
+        color: "#FF5733",
+        velocity: 0,
+        gravity: 0.5,
+        jump: -8
+      };
+
+      const pipes = [];
+      const pipeWidth = 50;
+      const pipeGap = 130; // Espacement fixe entre les tuyaux haut bas
+      const pipeVelocity = 2;
+      let score = 0;
+      let gameStarted = false; // Variable pour suivre le statut du jeu
+
+      function drawBird() {
+        context.fillStyle = bird.color;
+        context.fillRect(bird.x, bird.y, bird.width, bird.height);
+      }
+
+      function drawPipe(pipeX, openingY) {
+        context.fillStyle = "#66BB6A"; // Couleur du tuyau
+        context.fillRect(pipeX, 0, pipeWidth, openingY);
+        context.fillRect(pipeX, openingY + pipeGap, pipeWidth, canvas.height - openingY - pipeGap);
+      }
+
+      function draw() {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Dessiner l'oiseau
+        drawBird();
+
+        // Dessiner les tuyaux
+        for (let i = 0; i < pipes.length; i++) {
+          drawPipe(pipes[i].x, pipes[i].openingY);
+        }
+
+        // Afficher le score
+        context.fillStyle = "#000";
+        context.font = "20px Arial";
+        context.fillText("Score: " + score, 10, 30);
+      }
+
+      function update() {
+        if (!gameStarted) {
+          return; // Ne pas mettre à jour si le jeu n'a pas encore commencé
+        }
+
+        // Mettre à jour la position de l'oiseau
+        bird.velocity += bird.gravity;
+        bird.y += bird.velocity;
+
+        // Mettre à jour la position des tuyaux
+        for (let i = pipes.length - 1; i >= 0; i--) {
+          pipes[i].x -= pipeVelocity;
+
+          // Vérifier la collision avec l'oiseau
+          if (
+            bird.x < pipes[i].x + pipeWidth &&
+            bird.x + bird.width > pipes[i].x &&
+            (bird.y < pipes[i].openingY || bird.y + bird.height > pipes[i].openingY + pipeGap)
+          ) {
+            // Collision détectée, redémarrer le jeu
+            alert("Game Over! Your score is: " + score);
+            bird.y = canvas.height / 2 - 15;
+            pipes.length = 0;
+            score = 0;
+            gameStarted = false; // Mettre le jeu en pause
+          }
+
+          // Vérifier le passage à travers le tuyau
+          if (pipes[i].x + pipeWidth < bird.x && !pipes[i].passed) {
+            pipes[i].passed = true;
+            score++;
+          }
+
+          // Supprimer les tuyaux hors écran
+          if (pipes[i].x + pipeWidth < 0) {
+            pipes.splice(i, 1);
+          }
+        }
+
+        // Générer de nouveaux tuyaux
+        if (pipes.length === 0 || pipes[pipes.length - 1].x < canvas.width - 200) {
+          const openingY = Math.floor(Math.random() * (canvas.height - pipeGap));
+          pipes.push({ x: canvas.width, openingY: openingY, passed: false });
+        }
+      }
+
+      function gameLoop() {
+        draw();
+        update();
+        requestAnimationFrame(gameLoop);
+      }
+
+      function handleJump() {
+        if (!gameStarted) {
+          gameStarted = true; // Commencer le jeu si ce n'est pas encore commencé
+        }
+        bird.velocity = bird.jump;
+      }
+
+      // Gestion des événements tactiles pour simuler la barre d'espace
+      document.addEventListener("keydown", handleJump);
+      canvas.addEventListener("touchstart", handleJump);
+
+      gameLoop();
+    });
+  </script>
+</body>
+</html>

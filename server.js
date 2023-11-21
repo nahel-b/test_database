@@ -83,6 +83,11 @@ app.get('/signup', (req, res) => {
   res.render('signup', { erreur: null });
 });
 
+app.get('/fb', (req, res) => 
+{
+  res.render('test_flappy_bird');
+});
+
 // Route pour gérer l'inscription
 app.post('/signup',limiter, async (req, res) => {
   const { username, password,nom, prenom } = req.body;
