@@ -33,7 +33,7 @@ const rateLimit = require("express-rate-limit");
 
 const limiter = rateLimit({
   windowMs: 15* 60 * 1000, // 15 minutes
-  max: 2, // 50 tentatives maximum par fenêtre
+  max: 20, // 50 tentatives maximum par fenêtre
   handler: (req, res) => {
     if (req.session.utilisateur) {
       log(req.session.utilisateur.username + " a dépassé la limite de tentatives de connexion");
@@ -41,9 +41,9 @@ const limiter = rateLimit({
     else {
       log("Quelqu'un a dépassé la limite de tentatives de connexion");
     }
-    // res.status(429).json({
-    //   error: 'Trop de tentatives à partir de cette adresse IP. Veuillez réessayer après 15 minutes.'
-    // });
+    res.status(429).json({
+      error: 'Trop de tentatives à partir de cette adresse IP. Veuillez réessayer après 15 minutes.'
+    });
   }
 });
 
@@ -84,7 +84,7 @@ app.get('/signup', (req, res) => {
 
 // Route pour gérer l'inscription
 app.post('/signup',limiter, async (req, res) => {
-  const { username, password } = req.body;
+  const { username, password,nom, prenom } = req.body;
 
 
   // Vérifiez si l'utilisateur existe déjà dans la base de données
@@ -97,7 +97,7 @@ app.post('/signup',limiter, async (req, res) => {
   const hash = await bcrypt.hash(password, 10);
 
   // Enregistrez les nouvelles informations d'identification dans la base de données
-  await db.collection('utilisateurs').insertOne({ username, password: hash });
+  await db.collection('utilisateurs').insertOne({ username, password: hash,nom,prenom });
   log("Nouvel utilisateur: " + username);
   res.redirect('/login');
 });
