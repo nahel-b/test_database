@@ -32,24 +32,25 @@ function log(string ) {
 const rateLimit = require("express-rate-limit");
 
 const limiter = rateLimit({
-  windowMs:  60 * 1000, // 15 minutes
-  max: 50, // 50 tentatives maximum par fenêtre
+  windowMs: 15* 60 * 1000, // 15 minutes
+  max: 2, // 50 tentatives maximum par fenêtre
   handler: (req, res) => {
+    if (req.session.utilisateur) {
+      log(req.session.utilisateur.username + " a dépassé la limite de tentatives de connexion");
+    }
+    else {
+      log("Quelqu'un a dépassé la limite de tentatives de connexion");
+    }
     res.status(429).json({
       error: 'Trop de tentatives à partir de cette adresse IP. Veuillez réessayer après 15 minutes.'
     });
   }
 });
-app.post('/signup', limiter, async (req, res) => {
-  //log le nom d'utilisateur qui a dépassé la limite
-  if (req.session.utilisateur) {
-    log(req.session.utilisateur.username + " a dépassé la limite de tentatives de connexion");
-  }
-  else {
-    log("Quelqu'un a dépassé la limite de tentatives de connexion");
-  }
+// app.post('/signup', limiter, async (req, res) => {
+//   //log le nom d'utilisateur qui a dépassé la limite
+  
  
-});
+// });
 
 
 
@@ -90,7 +91,7 @@ app.get('/signup', (req, res) => {
 });
 
 // Route pour gérer l'inscription
-app.post('/signup', async (req, res) => {
+app.post('/signup',limiter, async (req, res) => {
   const { username, password } = req.body;
 
 
