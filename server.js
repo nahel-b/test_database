@@ -41,19 +41,11 @@ const limiter = rateLimit({
     else {
       log("Quelqu'un a dépassé la limite de tentatives de connexion");
     }
-    res.status(429).json({
-      error: 'Trop de tentatives à partir de cette adresse IP. Veuillez réessayer après 15 minutes.'
-    });
+    // res.status(429).json({
+    //   error: 'Trop de tentatives à partir de cette adresse IP. Veuillez réessayer après 15 minutes.'
+    // });
   }
 });
-// app.post('/signup', limiter, async (req, res) => {
-//   //log le nom d'utilisateur qui a dépassé la limite
-  
- 
-// });
-
-
-
 
 
 // Route pour la page d'accueil
