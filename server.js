@@ -30,7 +30,7 @@ app.get('/', (req, res) => {
 
 // Route pour la page de connexion
 app.get('/login', (req, res) => {
-  res.render('login');
+  res.render('login', { erreur: null }); // Assurez-vous que 'erreur' est défini
 });
 
 // Route pour gérer la connexion
@@ -47,6 +47,8 @@ app.post('/login', async (req, res) => {
     res.render('login', { erreur: 'Nom d\'utilisateur ou mot de passe incorrect' });
   }
 });
+
+
 
 // Route pour la page d'inscription
 app.get('/signup', (req, res) => {
