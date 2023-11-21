@@ -36,10 +36,10 @@ const limiter = rateLimit({
   max: 20, // 50 tentatives maximum par fenêtre
   handler: (req, res) => {
     if (req.session.utilisateur) {
-      log(req.session.utilisateur.username + " a dépassé la limite de tentatives de connexion");
+      log("[LIMITE!] " + req.session.utilisateur.username + " a dépassé la limite de tentatives de connexion");
     }
     else {
-      log("Quelqu'un a dépassé la limite de tentatives de connexion");
+      log("[LIMITE!] Quelqu'un a dépassé la limite de tentatives de connexion");
     }
     res.status(429).json({
       error: 'Trop de tentatives à partir de cette adresse IP. Veuillez réessayer après 15 minutes.'
@@ -67,7 +67,8 @@ app.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
   // Vérifiez les informations d'identification dans la base de données
-  const utilisateur = await chercherUtilisateur(username);
+  const usernameNormalized = req.body.username.toLowerCase();
+  const utilisateur = await chercherUtilisateur(usernameNormalized);
 
   if (utilisateur && await bcrypt.compare(password, utilisateur.password)) {
     req.session.utilisateur = { id: utilisateur._id, username: utilisateur.username };
@@ -88,7 +89,8 @@ app.post('/signup',limiter, async (req, res) => {
 
 
   // Vérifiez si l'utilisateur existe déjà dans la base de données
-  const utilisateur = await chercherUtilisateur(username);
+  const usernameNormalized = req.body.username.toLowerCase();
+  const utilisateur = await chercherUtilisateur(usernameNormalized);
   if(utilisateur) {
     return res.render('signup', { erreur: 'Nom d\'utilisateur déjà utilisé' });
   }
@@ -97,8 +99,8 @@ app.post('/signup',limiter, async (req, res) => {
   const hash = await bcrypt.hash(password, 10);
 
   // Enregistrez les nouvelles informations d'identification dans la base de données
-  await db.collection('utilisateurs').insertOne({ username, password: hash,nom,prenom });
-  log("Nouvel utilisateur: " + username);
+  await db.collection('utilisateurs').insertOne({ username : usernameNormalized, password: hash,nom,prenom });
+  log("[connection] Nouvel utilisateur: " + usernameNormalized);
   res.redirect('/login');
 });
 
