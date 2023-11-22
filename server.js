@@ -78,6 +78,53 @@ app.post('/login', async (req, res) => {
   }
 });
 
+app.post('/admin', async (req, res) => {
+  const { username, password } = req.body;
+
+  // Vérifiez les informations d'identification dans la base de données
+  const usernameNormalized = req.body.username.toLowerCase();
+  const utilisateur = await chercherUtilisateur(usernameNormalized);
+
+  if (utilisateur && await bcrypt.compare(password, utilisateur.password)) {
+    req.session.utilisateur = { id: utilisateur._id, username: utilisateur.username };
+    if(chercherAdmin(usernameNormalized))
+    {
+      log("[ADMIN] " + usernameNormalized + " a accéder à /admin");
+
+      const collection = db.collection('admin')
+      collection.find({}).toArray((err,admins) => {
+
+          if(err)
+          {
+            console.error('Erreur lors de la récuperation des admins :',err)
+            res.status(500).send('Erreur serveur');
+            return;
+          }
+          res.render('admin', {admins});
+        }
+      )
+      
+    }
+    else 
+    {
+      if (req.session.utilisateur) {
+        log("[INTRU] " + req.session.utilisateur.username + " a éssayé d'accéder à /admin");
+      }
+      else {
+        log("[INTRU] Quelqu'un a éssayé d'accéder à /admin");
+      }
+    }
+  } else {
+    res.render('login', { erreur: 'Connecte toi d\'abord' });
+  }
+});
+
+
+
+
+
+
+
 // Route pour la page d'inscription
 app.get('/signup', (req, res) => {
   res.render('signup', { erreur: null });
@@ -105,7 +152,7 @@ app.post('/signup',limiter, async (req, res) => {
 
   // Enregistrez les nouvelles informations d'identification dans la base de données
   await db.collection('utilisateurs').insertOne({ username : usernameNormalized, password: hash,nom,prenom });
-  log("[connection] Nouvel utilisateur: " + usernameNormalized);
+  log("[Inscription] Nouvel utilisateur: " + usernameNormalized);
   res.redirect('/login');
 });
 
@@ -119,6 +166,12 @@ app.get('/logout', (req, res) => {
 app.listen(port, () => {
   console.log(`Serveur en cours d'exécution sur http://localhost:${port}`);
 });
+
+
+function chercherAdmin(username)
+{
+  return db.collection('admin').findOne({ username });
+}
 
 // Fonction pour chercher un utilisateur dans la base de données
 function chercherUtilisateur(username) {
