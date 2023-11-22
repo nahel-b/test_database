@@ -96,7 +96,7 @@ app.get('/admin', async (req, res) => {
   // Vérifiez les informations d'identification dans la base de données
   const usernameNormalized = req.session.utilisateur.username.toLowerCase();
   console.log("a :" + usernameNormalized)
-  const utilisateur = await chercherAdmin(usernameNormalized);
+  const utilisateur = await chercherUtilisateur(usernameNormalized);
 
   if(utilisateur){
 
