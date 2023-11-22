@@ -20,5 +20,13 @@
 
         <% });%>
   </table>
+
+  <h2>Ajouter un admin</h2>
+  <form action="/addAdmin" method="post">
+    <label for="adminUsername">Username de l'admin</label>
+    <input type="text" id="adminUsername" name="adminUsername" required>
+    <button type="submit" >Ajouter</button>
+  </form>
+  
 </body>
 </html>

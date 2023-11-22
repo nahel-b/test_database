@@ -78,7 +78,7 @@ app.post('/login', async (req, res) => {
   }
 });
 
-app.post('/admin', async (req, res) => {
+app.get('/admin', async (req, res) => {
   const { username, password } = req.body;
 
   // Vérifiez les informations d'identification dans la base de données
