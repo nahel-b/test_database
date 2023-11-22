@@ -81,8 +81,7 @@ app.post('/login', async (req, res) => {
     );
 
     req.session.utilisateur = { session_id: randomId, username: utilisateur.username };
-    console.log("B' =" + randomId)
-    console.log("C' =" + req.session.utilisateur.session_id)
+
     res.redirect('/');
   } else {
     res.render('login', { erreur: 'Nom d\'utilisateur ou mot de passe incorrect' });
@@ -101,13 +100,10 @@ app.get('/admin', async (req, res) => {
   if(utilisateur){
 
     const authLevel = await getAuthLevel(usernameNormalized)
-    console.log("A =" + authLevel)
-    console.log("B =" + utilisateur.session_id)
-    console.log("C =" + req.session.utilisateur.id)
+
   if ( authLevel > 0 && utilisateur.session_id === req.session.utilisateur.session_id )
  {
-   
-      console.log("b :" + utilisateur)
+
       log("[ADMIN] " + usernameNormalized + " a accéder à /admin");
 
       const collection = db.collection('admin')
@@ -144,14 +140,19 @@ else {
 
 app.post('/addAdmin', async (req, res) => {
 
-  if (req.session.utilisateur && req.body.adminUsername) {
+  if (req.session.utilisateur) {
  
     // Vérifiez les informations d'identification dans la base de données
     const usernameNormalized = req.session.utilisateur.username.toLowerCase();
-    const adminToAdd= req.body.adminUsername.toLowerCase();
-    const utilisateur = await chercherAdmin(usernameNormalized);
-
-    if ( utilisateur && utilisateur._id == req.session.utilisateur.id ) {
+    console.log("a :" + usernameNormalized)
+    const utilisateur = await chercherUtilisateur(usernameNormalized);
+  
+    if(utilisateur){
+  
+      const authLevel = await getAuthLevel(usernameNormalized)
+  
+    if ( authLevel > 0 && utilisateur.session_id === req.session.utilisateur.session_id )
+   {
      
      
       
@@ -159,19 +160,21 @@ app.post('/addAdmin', async (req, res) => {
       collection.insertOne({username : adminToAdd});
       log("[ADMIN] " + usernameNormalized + " a ajouter un amdin : " + adminToAdd + "(/addAdmin)");
 
-    } else {
-      if (req.session.utilisateur) {
-        log("[INTRU] " + req.session.utilisateur.username + " a éssayé d'accéder à /admin");
+   }else {
+        if (req.session.utilisateur) {
+          log("[INTRU] " + req.session.utilisateur.username + " a éssayé d'accéder à /admin");
+        }
+        else {
+          log("[INTRU] Quelqu'un a éssayé d'accéder à /admin");
+        }
       }
-      else {
-        log("[INTRU] Quelqu'un a éssayé d'accéder à /admin");
-      }
+    
+    } }
+    
+    else {
+    
+      res.redirect('/login');
     }
-  
-  } else {
-  
-    res.redirect('/login');
-  }
 
 });
 

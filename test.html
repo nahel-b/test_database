@@ -1,0 +1,71 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin</title>
+  <style>
+    table,
+td {
+  border: 1px solid #333;
+}
+
+thead,
+tfoot {
+  background-color: #333;
+  color: #fff;
+}
+  </style>
+</head>
+<body>
+  <h1>Liste des admin</h1>
+  <table border="1">
+    <thead>
+        <tr>
+            <th colspan="3">Administrateur
+            </th>
+        </tr>
+            </thead>
+    <tr>
+        <th>Username :</th>
+        <th> Authorisation :</th>
+    </tr>
+    
+        <form action="/authAdmin" name ="nahel">
+        <tr>
+            <th>nahel</th>
+            
+            
+            <th><select id="authVal">
+                <option value="1">1</option>
+                <option value="2" selected>2</option>
+                <option value="3">3</option>
+              </select></th>
+              <th><button>-</button></th>
+            </form>
+        </tr>
+
+        <tr>
+            <th><input type="text" placeholder="username"></th>
+            
+            
+            <th><select id="authVal">
+                <option value="1" selected >1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+              </select></th>
+              <th><button>+</button></th>
+        </tr>
+  </table>
+
+  <h2>Ajouter un admin</h2>
+  <form action="/addAdmin" method="post">
+    <label for="adminUsername">Username de l'admin</label>
+    <input type="text" id="adminUsername" name="adminUsername" required>
+    <button type="submit" >Ajouter</button>
+  </form>
+  
+</body>
+</html>
