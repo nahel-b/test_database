@@ -84,12 +84,14 @@ app.get('/admin', async (req, res) => {
  
   // Vérifiez les informations d'identification dans la base de données
   const usernameNormalized = req.session.utilisateur.username.toLowerCase();
+  console.log("a :" + usernameNormalized)
   const utilisateur = await chercherUtilisateur(usernameNormalized);
 
   if (utilisateur._id == req.session.utilisateur.id ) {
    
     if(chercherAdmin(usernameNormalized))
     {
+      console.log("b :" + chercherAdmin(usernameNormalized))
       log("[ADMIN] " + usernameNormalized + " a accéder à /admin");
 
       const collection = db.collection('admin')
