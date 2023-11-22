@@ -136,7 +136,7 @@ app.post('/addAdmin', async (req, res) => {
   if (req.session.utilisateur && req.body.adminUsername) {
  
     // Vérifiez les informations d'identification dans la base de données
-    const usernameNormalized = req.body.username.toLowerCase();
+    const usernameNormalized = req.body.utilisateur.username.toLowerCase();
     const adminToAdd= req.body.adminUsername.toLowerCase();
     const utilisateur = await chercherUtilisateur(usernameNormalized);
 
