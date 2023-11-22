@@ -3,6 +3,7 @@ const session = require('express-session');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const { MongoClient } = require('mongodb');
+const crypto = require('crypto');
 require('dotenv').config();
 
 const app = express();
@@ -71,7 +72,17 @@ app.post('/login', async (req, res) => {
   const utilisateur = await chercherUtilisateur(usernameNormalized);
 
   if (utilisateur && await bcrypt.compare(password, utilisateur.password)) {
-    req.session.utilisateur = { id: utilisateur._id, username: utilisateur.username };
+
+    const randomId = crypto.randomBytes(16).toString('hex'); // Génère un ID aléatoire
+
+    await db.collection('utilisateurs').updateOne(
+ 
+      { $set: { session_id: randomId } }
+    );
+
+    req.session.utilisateur = { session_id: randomId, username: utilisateur.username };
+    console.log("B' =" + randomId)
+    console.log("C' =" + req.session.utilisateur.id)
     res.redirect('/');
   } else {
     res.render('login', { erreur: 'Nom d\'utilisateur ou mot de passe incorrect' });
@@ -87,11 +98,13 @@ app.get('/admin', async (req, res) => {
   console.log("a :" + usernameNormalized)
   const utilisateur = await chercherAdmin(usernameNormalized);
 
-  console.log("A :" + utilisateur)
-  console.log("B :" + utilisateur._id)
-  console.log("C :" + req.session.utilisateur.id)
-  console.log("E" + utilisateur._id == req.session.utilisateur.id )
-  if (utilisateur && utilisateur._id == req.session.utilisateur.id )
+  if(utilisateur){
+
+    const authLevel = await getAuthLevel(usernameNormalized)
+    console.log("A =" + authLevel)
+    console.log("B =" + utilisateur.session_id)
+    console.log("C =" + req.session.utilisateur.id)
+  if ( authLevel > 0 && utilisateur.session_id === req.session.utilisateur.id )
  {
    
       console.log("b :" + utilisateur)
@@ -113,14 +126,16 @@ app.get('/admin', async (req, res) => {
     
   } else {
     if (req.session.utilisateur) {
-      log("[INTRU] " + req.session.utilisateur.username + " a éssayé d'accéder à /admin avec un mauvais id");
+      log("[INTRU] " + req.session.utilisateur.username + " a éssayé d'accéder à /admin");
     }
     else {
-      log("[INTRU] Quelqu'un a éssayé d'accéder à /admin avec un mauvais id");
+      log("[INTRU] Quelqu'un a éssayé d'accéder à /admin");
     }
   }
 
-} else {
+} }
+
+else {
 
   res.redirect('/login');
 }
@@ -161,7 +176,12 @@ app.post('/addAdmin', async (req, res) => {
 });
 
 
+app.post('/modifierValeur', (req, res) => {
+  const nomFormulaire = req.body.formulaireName;
+  const nouvelleValeur = req.body.authVal;
 
+  res.send('=' + nomFormulaire + "-" + nouvelleValeur);
+});
 
 
 // Route pour la page d'inscription
@@ -190,7 +210,7 @@ app.post('/signup',limiter, async (req, res) => {
   const hash = await bcrypt.hash(password, 10);
 
   // Enregistrez les nouvelles informations d'identification dans la base de données
-  await db.collection('utilisateurs').insertOne({ username : usernameNormalized, password: hash,nom,prenom });
+  await db.collection('utilisateurs').insertOne({ username : usernameNormalized, password: hash,nom,prenom, authLevel : 0 });
   log("[Inscription] Nouvel utilisateur: " + usernameNormalized);
   res.redirect('/login');
 });
@@ -206,11 +226,16 @@ app.listen(port, () => {
   console.log(`Serveur en cours d'exécution sur http://localhost:${port}`);
 });
 
-
-function chercherAdmin(username)
+async function getAuthLevel(username)
 {
-  return db.collection('admin').findOne({ username });
+  const u = await chercherUtilisateur(username)
+  if(u)
+  {
+    return u.authLevel
+  }
+  return 0
 }
+
 
 // Fonction pour chercher un utilisateur dans la base de données
 function chercherUtilisateur(username) {
