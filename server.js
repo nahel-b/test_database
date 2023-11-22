@@ -76,7 +76,7 @@ app.post('/login', async (req, res) => {
     const randomId = crypto.randomBytes(16).toString('hex'); // Génère un ID aléatoire
 
     await db.collection('utilisateurs').updateOne(
- 
+      { username: usernameNormalized },
       { $set: { session_id: randomId } }
     );
 
