@@ -87,11 +87,11 @@ app.get('/admin', async (req, res) => {
   console.log("a :" + usernameNormalized)
   const utilisateur = await chercherAdmin(usernameNormalized);
 
+  console.log("A :" + utilisateur)
+  
   if (utilisateur && utilisateur._id == req.session.utilisateur.id )
  {
    
-    if(utilisateur)
-    {
       console.log("b :" + utilisateur)
       log("[ADMIN] " + usernameNormalized + " a accéder à /admin");
 
@@ -108,16 +108,7 @@ app.get('/admin', async (req, res) => {
         }
       )
       
-    }
-    else 
-    {
-      if (req.session.utilisateur) {
-        log("[INTRU] " + req.session.utilisateur.username + " a éssayé d'accéder à /admin");
-      }
-      else {
-        log("[INTRU] Quelqu'un a éssayé d'accéder à /admin");
-      }
-    }
+    
   } else {
     if (req.session.utilisateur) {
       log("[INTRU] " + req.session.utilisateur.username + " a éssayé d'accéder à /admin avec un mauvais id");
@@ -143,32 +134,20 @@ app.post('/addAdmin', async (req, res) => {
     const adminToAdd= req.body.adminUsername.toLowerCase();
     const utilisateur = await chercherAdmin(usernameNormalized);
 
-  
     if ( utilisateur && utilisateur._id == req.session.utilisateur.id ) {
      
-      if(utilisateur)
-    {
+     
       
       const collection = db.collection('admin');
       collection.insertOne({username : adminToAdd});
       log("[ADMIN] " + usernameNormalized + " a ajouter un amdin : " + adminToAdd + "(/addAdmin)");
 
-    }
-    else 
-    {
-      if (req.session.utilisateur) {
-        log("[INTRU] " + req.session.utilisateur.username + " a éssayé d'accéder à /addAdmin");
-      }
-      else {
-        log("[INTRU] Quelqu'un a éssayé d'accéder à /addAdmin");
-      }
-    }
     } else {
       if (req.session.utilisateur) {
-        log("[INTRU] " + req.session.utilisateur.username + " a éssayé d'accéder à /admin avec un mauvais id");
+        log("[INTRU] " + req.session.utilisateur.username + " a éssayé d'accéder à /admin");
       }
       else {
-        log("[INTRU] Quelqu'un a éssayé d'accéder à /admin avec un mauvais id");
+        log("[INTRU] Quelqu'un a éssayé d'accéder à /admin");
       }
     }
   
