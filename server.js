@@ -88,7 +88,9 @@ app.get('/admin', async (req, res) => {
   const utilisateur = await chercherAdmin(usernameNormalized);
 
   console.log("A :" + utilisateur)
-  
+  console.log("B :" + utilisateur._id)
+  console.log("C :" + req.session.utilisateur.id)
+  console.log("E" + utilisateur._id == req.session.utilisateur.id )
   if (utilisateur && utilisateur._id == req.session.utilisateur.id )
  {
    
