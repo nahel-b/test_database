@@ -92,7 +92,7 @@ app.get('/admin', async (req, res) => {
    
     if(utilisateur)
     {
-      console.log("b :" + chercherAdmin(usernameNormalized))
+      console.log("b :" + utilisateur)
       log("[ADMIN] " + usernameNormalized + " a accéder à /admin");
 
       const collection = db.collection('admin')
