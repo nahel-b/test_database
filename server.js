@@ -87,7 +87,8 @@ app.get('/admin', async (req, res) => {
   console.log("a :" + usernameNormalized)
   const utilisateur = await chercherUtilisateur(usernameNormalized);
 
-  if (utilisateur._id == req.session.utilisateur.id ) {
+  if (utilisateur && utilisateur._id == req.session.utilisateur.id )
+ {
    
     if(chercherAdmin(usernameNormalized))
     {
@@ -138,14 +139,14 @@ app.post('/addAdmin', async (req, res) => {
   if (req.session.utilisateur && req.body.adminUsername) {
  
     // Vérifiez les informations d'identification dans la base de données
-    const usernameNormalized = req.body.utilisateur.username.toLowerCase();
+    const usernameNormalized = req.session.utilisateur.username.toLowerCase();
     const adminToAdd= req.body.adminUsername.toLowerCase();
     const utilisateur = await chercherUtilisateur(usernameNormalized);
 
   
-    if (utilisateur._id == req.session.utilisateur.id ) {
+    if ( utilisateur && utilisateur._id == req.session.utilisateur.id ) {
      
-      if(chercherAdmin(usernameNormalized))
+      if(utilisateur)
     {
       
       const collection = db.collection('admin');
