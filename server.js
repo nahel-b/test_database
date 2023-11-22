@@ -81,12 +81,17 @@ app.post('/login', async (req, res) => {
 app.get('/admin', async (req, res) => {
   const { username, password } = req.body;
 
+  if (req.session.utilisateur) {
+ 
+  
+
+
   // Vérifiez les informations d'identification dans la base de données
-  const usernameNormalized = req.body.username.toLowerCase();
+  const usernameNormalized = req.session.utilisateur.username.toLowerCase();
   const utilisateur = await chercherUtilisateur(usernameNormalized);
 
-  if (utilisateur && await bcrypt.compare(password, utilisateur.password)) {
-    req.session.utilisateur = { id: utilisateur._id, username: utilisateur.username };
+  if (utilisateur._id == req.session.utilisateur.id ) {
+   
     if(chercherAdmin(usernameNormalized))
     {
       log("[ADMIN] " + usernameNormalized + " a accéder à /admin");
@@ -115,11 +120,54 @@ app.get('/admin', async (req, res) => {
       }
     }
   } else {
+    if (req.session.utilisateur) {
+      log("[INTRU] " + req.session.utilisateur.username + " a éssayé d'accéder à /admin avec un mauvais id");
+    }
+    else {
+      log("[INTRU] Quelqu'un a éssayé d'accéder à /admin avec un mauvais id");
+    }
+  }
+
+} else {
+
+  res.redirect('/login');
+}
+
+});
+
+app.post('/addAdmin', async (req, res) => {
+  const { username, password } = req.body;
+
+  // Vérifiez les informations d'identification dans la base de données
+  const usernameNormalized = req.body.username.toLowerCase();
+  const adminToAdd= req.body.adminUsername.toLowerCase();
+  const utilisateur = await chercherUtilisateur(usernameNormalized);
+
+  if (utilisateur && await bcrypt.compare(password, utilisateur.password)) {
+    req.session.utilisateur = { id: utilisateur._id, username: utilisateur.username };
+    if(chercherAdmin(usernameNormalized))
+    {
+      const adminAdd = req
+      
+
+      const collection = db.collection('admin');
+      collection.insertOne({username : adminToAdd});
+      log("[ADMIN] " + usernameNormalized + " a ajouter un amdin : " + adminToAdd + "(/addAdmin)");
+
+    }
+    else 
+    {
+      if (req.session.utilisateur) {
+        log("[INTRU] " + req.session.utilisateur.username + " a éssayé d'accéder à /addAdmin");
+      }
+      else {
+        log("[INTRU] Quelqu'un a éssayé d'accéder à /addAdmin");
+      }
+    }
+  } else {
     res.render('login', { erreur: 'Connecte toi d\'abord' });
   }
 });
-
-
 
 
 
