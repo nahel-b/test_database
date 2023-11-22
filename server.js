@@ -90,7 +90,7 @@ app.get('/admin', async (req, res) => {
   if (utilisateur && utilisateur._id == req.session.utilisateur.id )
  {
    
-    if(chercherAdmin(usernameNormalized))
+    if(utilisateur)
     {
       console.log("b :" + chercherAdmin(usernameNormalized))
       log("[ADMIN] " + usernameNormalized + " a accéder à /admin");
