@@ -82,7 +82,7 @@ app.post('/login', async (req, res) => {
 
     req.session.utilisateur = { session_id: randomId, username: utilisateur.username };
     console.log("B' =" + randomId)
-    console.log("C' =" + req.session.utilisateur.id)
+    console.log("C' =" + req.session.utilisateur.session_id)
     res.redirect('/');
   } else {
     res.render('login', { erreur: 'Nom d\'utilisateur ou mot de passe incorrect' });
@@ -104,7 +104,7 @@ app.get('/admin', async (req, res) => {
     console.log("A =" + authLevel)
     console.log("B =" + utilisateur.session_id)
     console.log("C =" + req.session.utilisateur.id)
-  if ( authLevel > 0 && utilisateur.session_id === req.session.utilisateur.id )
+  if ( authLevel > 0 && utilisateur.session_id === req.session.utilisateur.session_id )
  {
    
       console.log("b :" + utilisateur)
