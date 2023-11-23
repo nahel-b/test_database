@@ -90,8 +90,7 @@ app.post('/login', async (req, res) => {
 
 app.get('/admin', async (req, res) => {
 
-
-  const auth = await verifAuthLevel("admin")
+  const auth = await verifAuthLevel(req,"admin")
 
   if (req.session.utilisateur) {
  
@@ -217,7 +216,7 @@ app.listen(port, () => {
 });
 
 
-async function verifAuthLevel(str = "?")
+async function verifAuthLevel(req,str = "?")
 {
   if (req.session.utilisateur) {
  

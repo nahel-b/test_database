@@ -9,24 +9,59 @@
 <body>
   <h1>Liste des admin</h1>
   <table border="1">
+    <thead>
+      <tr>
+        <th colspan="3">Administrateur</th>
+      </tr>
+    </thead>
     <tr>
-        <th>Username :</th>
+      <th>Username :</th>
+      <th> Authorisation :</th>
+      <th>Action</th>
     </tr>
-    <% admins.forEach( admin => { %>
-
+  
+    <% for (const user of users) { %>
+      <form action="/authAdmin" method="post" name="authForm">
         <tr>
-            <th><%=admin.username%></th>
+          <th><%= user.username %></th>
+          <th>
+            <select name="authVal">
+              <option value="1" <%= user.authLevel === 1 ? 'selected' : '' %>>1</option>
+              <option value="2" <%= user.authLevel === 2 ? 'selected' : '' %>>2</option>
+              <option value="3" <%= user.authLevel === 3 ? 'selected' : '' %>>3</option>
+            </select>
+          </th>
+          <th>
+            <button type="submit">+</button>
+            <button type="button" onclick="deleteUser('<%= user.username %>')">-</button>
+          </th>
         </tr>
-
-        <% });%>
+      </form>
+    <% } %>
+  
   </table>
-
-  <h2>Ajouter un admin</h2>
-  <form action="/addAdmin" method="post">
-    <label for="adminUsername">Username de l'admin</label>
-    <input type="text" id="adminUsername" name="adminUsername" required>
-    <button type="submit" >Ajouter</button>
-  </form>
+  
+  <!-- ... autres éléments ... -->
+  
+  <script>
+    function deleteUser(username) {
+      if (confirm(`Voulez-vous vraiment supprimer l'utilisateur ${username} ?`)) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/deleteUser';
+        form.style.display = 'none';
+  
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.name = 'username';
+        input.value = username;
+        form.appendChild(input);
+  
+        document.body.appendChild(form);
+        form.submit();
+      }
+    }
+  </script>
   
 </body>
 </html>

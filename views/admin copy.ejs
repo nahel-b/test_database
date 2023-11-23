@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin</title>
+</head>
+<body>
+  <h1>Liste des admin</h1>
+  <table border="1">
+    <tr>
+        <th>Username :</th>
+    </tr>
+    <% admins.forEach( admin => { %>
+
+        <tr>
+            <th><%=admin.username%></th>
+        </tr>
+
+        <% });%>
+  </table>
+
+  <h2>Ajouter un admin</h2>
+  <form action="/addAdmin" method="post">
+    <label for="adminUsername">Username de l'admin</label>
+    <input type="text" id="adminUsername" name="adminUsername" required>
+    <button type="submit" >Ajouter</button>
+  </form>
+  
+</body>
+</html>
