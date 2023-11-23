@@ -96,13 +96,13 @@ app.get('/admin', async (req, res) => {
  
   // Vérifiez les informations d'identification dans la base de données
   const usernameNormalized = req.session.utilisateur.username.toLowerCase();
-  console.log("a :" + usernameNormalized)
 
   if ( auth > 0 )
  {
       log("[ADMIN] " + usernameNormalized + " a accéder à /admin");
       
       const admins = await getAdmins()
+      console.log("admin="+admins)
 
       res.render('admin', { admins });
       
@@ -252,6 +252,7 @@ async function verifAuthLevel(req,res,str = "?")
   else {
   
     res.redirect('/login');
+    return -1;
   }
   res.redirect('/login');
   return -1;
