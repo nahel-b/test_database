@@ -101,17 +101,11 @@ app.get('/admin', async (req, res) => {
   if ( auth > 0 )
  {
       log("[ADMIN] " + usernameNormalized + " a accéder à /admin");
-      const collection = db.collection('admin')
-      collection.find({}).toArray((err,admins) => {
-          if(err)
-          {
-            console.error('Erreur lors de la récuperation des admins :',err)
-            res.status(500).send('Erreur serveur');
-            return;
-          }
-          res.render('admin', {admins});
-        }
-      )
+      
+      const admins = await getAdmins()
+
+      res.render('admin', { admins });
+      
   } else {
     if (req.session.utilisateur) {
       log("[INTRU] " + req.session.utilisateur.username + " a éssayé d'accéder à /admin");
@@ -123,6 +117,10 @@ app.get('/admin', async (req, res) => {
 } 
 
 });
+
+async function getAdmins() {
+  return db.collection('utilisateurs').find({ authLevel: { $gt: 0 } }).toArray();
+}
 
 app.post('/addAdmin', async (req, res) => {
 

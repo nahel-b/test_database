@@ -20,7 +20,7 @@
       <th>Action</th>
     </tr>
   
-    <% for (const user of users) { %>
+    <% for (const user of admins) { %>
       <form action="/authAdmin" method="post" name="authForm">
         <tr>
           <th><%= user.username %></th>
@@ -29,6 +29,7 @@
               <option value="1" <%= user.authLevel === 1 ? 'selected' : '' %>>1</option>
               <option value="2" <%= user.authLevel === 2 ? 'selected' : '' %>>2</option>
               <option value="3" <%= user.authLevel === 3 ? 'selected' : '' %>>3</option>
+              <option value="100" <%= user.authLevel === 100 ? 'selected' : '' %>>3</option>
             </select>
           </th>
           <th>
@@ -38,11 +39,20 @@
         </tr>
       </form>
     <% } %>
+    <tr>
+      <th><input type="text" placeholder="username"></th>
+      
+      
+      <th><select id="authVal">
+          <option value="1" selected >1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+        </select></th>
+        <th><button>+</button></th>
+  </tr>
   
   </table>
-  
-  <!-- ... autres éléments ... -->
-  
+    
   <script>
     function deleteUser(username) {
       if (confirm(`Voulez-vous vraiment supprimer l'utilisateur ${username} ?`)) {
