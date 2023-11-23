@@ -90,25 +90,20 @@ app.post('/login', async (req, res) => {
 
 app.get('/admin', async (req, res) => {
 
+
+  const auth = await verifAuthLevel("admin")
+
   if (req.session.utilisateur) {
  
   // Vérifiez les informations d'identification dans la base de données
   const usernameNormalized = req.session.utilisateur.username.toLowerCase();
   console.log("a :" + usernameNormalized)
-  const utilisateur = await chercherUtilisateur(usernameNormalized);
 
-  if(utilisateur){
-
-    const authLevel = await getAuthLevel(usernameNormalized)
-
-  if ( authLevel > 0 && utilisateur.session_id === req.session.utilisateur.session_id )
+  if ( auth > 0 )
  {
-
       log("[ADMIN] " + usernameNormalized + " a accéder à /admin");
-
       const collection = db.collection('admin')
       collection.find({}).toArray((err,admins) => {
-
           if(err)
           {
             console.error('Erreur lors de la récuperation des admins :',err)
@@ -118,8 +113,6 @@ app.get('/admin', async (req, res) => {
           res.render('admin', {admins});
         }
       )
-      
-    
   } else {
     if (req.session.utilisateur) {
       log("[INTRU] " + req.session.utilisateur.username + " a éssayé d'accéder à /admin");
@@ -128,13 +121,7 @@ app.get('/admin', async (req, res) => {
       log("[INTRU] Quelqu'un a éssayé d'accéder à /admin");
     }
   }
-
-} }
-
-else {
-
-  res.redirect('/login');
-}
+} 
 
 });
 
@@ -229,7 +216,51 @@ app.listen(port, () => {
   console.log(`Serveur en cours d'exécution sur http://localhost:${port}`);
 });
 
-async function getAuthLevel(username)
+
+async function verifAuthLevel(str = "?")
+{
+  if (req.session.utilisateur) {
+ 
+    const usernameNormalized = req.session.utilisateur.username.toLowerCase();
+    const utilisateur = await chercherUtilisateur(usernameNormalized);
+  
+    if(utilisateur){
+  
+      const authLevel = await getAuthLevelDb(usernameNormalized)
+  
+    if ( utilisateur.session_id === req.session.utilisateur.session_id )
+   {
+  
+        log("[ADMIN] " + usernameNormalized + " a accéder à /admin");
+  
+        return authLevel;
+        
+      
+    } else {
+      if (req.session.utilisateur) {
+        log("[INTRU] " + req.session.utilisateur.username + " a éssayé d'accéder à /" + str + " avec un faux username");
+        
+      }
+      else {
+        log("[INTRU] Quelqu'un a éssayé d'accéder à /" + str + " avec un faux username");
+      }
+      return -1
+      }
+  
+    } 
+  res.redirect('/login');
+  return -1;
+  }
+  
+  else {
+  
+    res.redirect('/login');
+  }
+  res.redirect('/login');
+  return -1;
+}
+
+async function getAuthLevelDb(username)
 {
   const u = await chercherUtilisateur(username)
   if(u)
