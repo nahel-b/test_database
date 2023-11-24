@@ -51,6 +51,7 @@
         </tr>
       </form>
     <% } %>
+    <% if(current_authLevel >= auth_ajouter_admin){  %>
     <tr>
       <form action="/authAdmin" method="post" name="modifierValeurForm">
         <tr>
@@ -66,7 +67,7 @@
         </tr>
     </form>
   </tr>
-  
+  <% } %>
   </table>
     
   <script>

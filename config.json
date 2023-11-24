@@ -1,5 +1,6 @@
 {
     "auth_voir_admin": 1,
     "auth_changer_authLevel": 2,
-    "auth_supprimer_admin": 3
+    "auth_ajouter_admin": 3,
+    "auth_supprimer_admin": 4
   }

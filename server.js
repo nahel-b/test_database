@@ -7,7 +7,7 @@ const crypto = require('crypto');
 require('dotenv').config();
 
 
-const { auth_voir_admin,auth_changer_authLevel, auth_supprimer_admin } = require('./config.json');
+const { auth_voir_admin,auth_changer_authLevel, auth_supprimer_admin,auth_ajouter_admin } = require('./config.json');
 
 
 const app = express();
@@ -109,7 +109,7 @@ app.get('/admin', async (req, res) => {
       
       const admins = await getAdmins()
 
-      res.render('admin', { admins, auth_changer_authLevel, auth_supprimer_admin, current_authLevel: auth,erreur: null });
+      res.render('admin', { admins, auth_changer_authLevel, auth_supprimer_admin, current_authLevel: auth,auth_ajouter_admin,erreur: null });
       
   } else {
     if (req.session.utilisateur) {
@@ -233,7 +233,9 @@ app.post('/authAdmin', async (req, res) => {
     log(`[INTRU] ${usernameNormalized} a tenté de supprimer un admin sans spécifier de nom (/authAdmin))`);
     return;
   }
-  else if (!chercherUtilisateur(usernameToChangeAuthLevel)) 
+  
+  const ut = await chercherUtilisateur(usernameToChangeAuthLevel)
+  if (!ut) 
   {
     res.redirect('/admin', { erreur: 'Cet utilisateur n\'existe pas' })
   }
