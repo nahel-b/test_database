@@ -108,7 +108,7 @@ app.get('/admin', async (req, res) => {
       const admins = await getAdmins()
       console.log("admin="+admins)
 
-      res.render('admin', { admins, auth_changer_authLevel, auth_supprimer_admin });
+      res.render('admin', { admins, auth_changer_authLevel, auth_supprimer_admin, current_authLevel: auth });
       
   } else {
     if (req.session.utilisateur) {
@@ -126,45 +126,48 @@ async function getAdmins() {
   return db.collection('utilisateurs').find({ authLevel: { $gt: 0 } }).toArray();
 }
 
-app.post('/addAdmin', async (req, res) => {
 
-  if (req.session.utilisateur) {
+
+
+// app.post('/addAdmin', async (req, res) => {
+
+//   if (req.session.utilisateur) {
  
-    // Vérifiez les informations d'identification dans la base de données
-    const usernameNormalized = req.session.utilisateur.username.toLowerCase();
-    console.log("a :" + usernameNormalized)
-    const utilisateur = await chercherUtilisateur(usernameNormalized);
+//     // Vérifiez les informations d'identification dans la base de données
+//     const usernameNormalized = req.session.utilisateur.username.toLowerCase();
+//     console.log("a :" + usernameNormalized)
+//     const utilisateur = await chercherUtilisateur(usernameNormalized);
   
-    if(utilisateur){
+//     if(utilisateur){
   
-      const authLevel = await getAuthLevel(usernameNormalized)
+//       const authLevel = await getAuthLevel(usernameNormalized)
   
-    if ( authLevel > 0 && utilisateur.session_id === req.session.utilisateur.session_id )
-   {
+//     if ( authLevel > 0 && utilisateur.session_id === req.session.utilisateur.session_id )
+//    {
      
      
       
-      const collection = db.collection('admin');
-      collection.insertOne({username : adminToAdd});
-      log("[ADMIN] " + usernameNormalized + " a ajouter un amdin : " + adminToAdd + "(/addAdmin)");
+//       const collection = db.collection('admin');
+//       collection.insertOne({username : adminToAdd});
+//       log("[ADMIN] " + usernameNormalized + " a ajouter un amdin : " + adminToAdd + "(/addAdmin)");
 
-   }else {
-        if (req.session.utilisateur) {
-          log("[INTRU] " + req.session.utilisateur.username + " a éssayé d'accéder à /admin");
-        }
-        else {
-          log("[INTRU] Quelqu'un a éssayé d'accéder à /admin");
-        }
-      }
+//    }else {
+//         if (req.session.utilisateur) {
+//           log("[INTRU] " + req.session.utilisateur.username + " a éssayé d'accéder à /admin");
+//         }
+//         else {
+//           log("[INTRU] Quelqu'un a éssayé d'accéder à /admin");
+//         }
+//       }
     
-    } }
+//     } }
     
-    else {
+//     else {
     
-      res.redirect('/login');
-    }
+//       res.redirect('/login');
+//     }
 
-});
+// });
 
 app.post('/deleteAdmin', async (req, res) => {
 
@@ -207,6 +210,59 @@ app.post('/deleteAdmin', async (req, res) => {
     res.redirect('/login');
   }
 });
+
+
+
+app.post('/authAdmin', async (req, res) => {
+
+
+  const auth = await verifAuthLevel(req,res,"admin")
+
+  if (req.session.utilisateur) {
+  
+  const usernameNormalized = req.session.utilisateur.username.toLowerCase();
+  
+  const { authVal } = req.body; // nouvelle auth
+  
+
+  if (!authVal) {
+    log(`[INTRU] ${usernameNormalized} a tenté de supprimer un admin sans spécifier de nom`);
+    return;
+  }
+  const authLevel = parseInt(authVal);
+
+
+    if ( auth >= auth_changer_authLevel )
+    {
+      
+      // Mise à jour de l'authLevel dans la base de données
+      const result = await db.collection('utilisateurs').updateOne(
+        { username: usernameNormalized },
+        { $set: { authLevel: authLevel } }
+      );
+
+      if (result.modifiedCount > 0) {
+        log(`[ADMIN] ${usernameNormalized} a mis à jour son authLevel à ${authLevel}`);
+        res.redirect('/admin'); // Redirection après la mise à jour
+      } else {
+        log(`[ERREUR] L'authLevel de ${usernameNormalized} n'a pas pu être mis à jour`);
+        res.status(500).send('Erreur serveur');
+      }
+
+
+} else 
+{
+  log(`[INTRU] ${usernameNormalized} a tenté de supprimer un admin (${usernameAdminToDelete} ) sans autorisation`);
+  res.status(403).send('Accès interdit'); // 403 Forbidden
+}
+} else {
+res.redirect('/login');
+}
+
+
+
+});
+
 
 
 //app.post('/changeAuthLevel', async (req, res) => {

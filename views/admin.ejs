@@ -16,8 +16,11 @@
     </thead>
     <tr>
       <th>Username :</th>
-      <th> Authorisation :</th>
+      <th> Autorisation :</th>
+    
+      
       <th>Action</th>
+
     </tr>
   
     <% for (const user of admins) { %>
@@ -25,7 +28,7 @@
         <tr>
           <th><%= user.username %></th>
           <th>
-            <% if(user.authLevel >= auth_changer_authLevel && user.authLevel<100 ){  %>
+            <% if(current_authLevel >= auth_changer_authLevel && user.authLevel<100 ){  %>
             <select name="authVal">
               
               <option value="1" <%= user.authLevel === 1 ? 'selected' : '' %>>1</option>
@@ -36,7 +39,7 @@
               <%= user.authLevel %>
             <% } %>
           </th>
-          <% if(user.authLevel >= auth_supprimer_admin && user.authLevel<100 ){  %></100>
+          <% if(current_authLevel >= auth_supprimer_admin && user.authLevel<100 ){  %></100>
           <th>
             <button type="button" onclick="deleteAdmin('<%= user.username %>')">-</button>
           </th>
