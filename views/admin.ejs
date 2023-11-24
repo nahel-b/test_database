@@ -41,6 +41,7 @@
           </th>
           <% if(current_authLevel >= auth_supprimer_admin && user.authLevel<100 ){  %></100>
           <th>
+            <input type="hidden" name="usernameToChangeAuthLevel" value="<%= user.username %>">
             <button type="button" onclick="deleteAdmin('<%= user.username %>')">-</button>
           </th>
           <% } %>

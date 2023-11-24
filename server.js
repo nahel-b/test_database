@@ -54,10 +54,10 @@ const limiter = rateLimit({
 
 
 // Route pour la page d'accueil
-app.get('/', (req, res) => {
+app.get('/', async (req, res) => {
 
   if (req.session.utilisateur) {
-    const auth = verifAuthLevel(req,res,"accueil")
+    const auth = await verifAuthLevel(req,res,"accueil")
     res.render('accueil', { username: req.session.utilisateur.username, current_authLevel: auth, auth_voir_admin} );
   } else {
     res.redirect('/login');
@@ -214,7 +214,6 @@ app.post('/deleteAdmin', async (req, res) => {
 });
 
 
-
 app.post('/authAdmin', async (req, res) => {
 
 
@@ -224,37 +223,41 @@ app.post('/authAdmin', async (req, res) => {
   
   const usernameNormalized = req.session.utilisateur.username.toLowerCase();
   
-  const { authVal } = req.body; // nouvelle auth
+  let { authVal, usernameToChangeAuthLevel } = req.body; // nouvelle auth
   
 
   if (!authVal) {
-    log(`[INTRU] ${usernameNormalized} a tenté de supprimer un admin sans spécifier de nom`);
+    log(`[INTRU] ${usernameNormalized} a tenté de supprimer un admin sans spécifier de auth (/authAdmin))`);
+    return;
+  }
+  if(!usernameToChangeAuthLevel) {
+    log(`[INTRU] ${usernameNormalized} a tenté de supprimer un admin sans spécifier de nom (/authAdmin))`);
     return;
   }
   const authLevel = parseInt(authVal);
-
+  usernameToChangeAuthLevel = usernameToChangeAuthLevel.toLowerCase();
 
     if ( auth >= auth_changer_authLevel )
     {
       
       // Mise à jour de l'authLevel dans la base de données
       const result = await db.collection('utilisateurs').updateOne(
-        { username: usernameNormalized },
+        { username: usernameToChangeAuthLevel },
         { $set: { authLevel: authLevel } }
       );
 
       if (result.modifiedCount > 0) {
-        log(`[ADMIN] ${usernameNormalized} a mis à jour son authLevel à ${authLevel}`);
+        log(`[ADMIN] ${usernameNormalized} a mis à jour le authLevel de ${usernameToChangeAuthLevel} à ${authLevel}`);
         res.redirect('/admin'); // Redirection après la mise à jour
       } else {
-        log(`[ERREUR] L'authLevel de ${usernameNormalized} n'a pas pu être mis à jour`);
+        log(`[ERREUR] L'authLevel de ${usernameToChangeAuthLevel} n'a pas pu être mis à jour`);
         res.status(500).send('Erreur serveur');
       }
 
 
 } else 
 {
-  log(`[INTRU] ${usernameNormalized} a tenté de supprimer un admin (${usernameAdminToDelete} ) sans autorisation`);
+  log(`[INTRU] ${usernameNormalized} a tenté de changer l'authLevel de (${usernameToChangeAuthLevel} ) sans autorisation`);
   res.status(403).send('Accès interdit'); // 403 Forbidden
 }
 } else {
