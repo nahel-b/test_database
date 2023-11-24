@@ -109,7 +109,7 @@ app.get('/admin', async (req, res) => {
       
       const admins = await getAdmins()
 
-      res.render('admin', { admins, auth_changer_authLevel, auth_supprimer_admin, current_authLevel: auth });
+      res.render('admin', { admins, auth_changer_authLevel, auth_supprimer_admin, current_authLevel: auth,erreur: null });
       
   } else {
     if (req.session.utilisateur) {
