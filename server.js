@@ -55,8 +55,10 @@ const limiter = rateLimit({
 
 // Route pour la page d'accueil
 app.get('/', (req, res) => {
+
   if (req.session.utilisateur) {
-    res.render('accueil', { username: req.session.utilisateur.username });
+    const auth = verifAuthLevel(req,res,"accueil")
+    res.render('accueil', { username: req.session.utilisateur.username, current_authLevel: auth, auth_voir_admin} );
   } else {
     res.redirect('/login');
   }

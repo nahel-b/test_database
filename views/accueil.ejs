@@ -9,6 +9,10 @@
 <body>
   <h1>Bienvenue, <%= username %>!</h1>
   <a href="/logout">Déconnexion</a>
+
+<% if (current_authLevel >= auth_voir_admin) { %>
+  <button onclick="window.location.href='/admin'">Admin</button>
+  <% } %>
 </body>
 </html>
 
