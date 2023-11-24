@@ -25,19 +25,22 @@
         <tr>
           <th><%= user.username %></th>
           <th>
+            <% if(user.authLevel >= auth_changer_authLevel && user.authLevel<100 ){  %>
             <select name="authVal">
-              <% if(user.authLevel <= 3 ){  %>
+              
               <option value="1" <%= user.authLevel === 1 ? 'selected' : '' %>>1</option>
               <option value="2" <%= user.authLevel === 2 ? 'selected' : '' %>>2</option>
               <option value="3" <%= user.authLevel === 3 ? 'selected' : '' %>>3</option>
-              <% } else{  %>
-              
-              <% } %>
             </select>
+            <% } else{  %>
+              <%= user.authLevel %>
+            <% } %>
           </th>
+          <% if(user.authLevel >= auth_supprimer_admin && user.authLevel<100 ){  %></100>
           <th>
             <button type="button" onclick="deleteAdmin('<%= user.username %>')">-</button>
           </th>
+          <% } %>
         </tr>
       </form>
     <% } %>

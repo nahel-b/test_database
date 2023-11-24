@@ -6,6 +6,10 @@ const { MongoClient } = require('mongodb');
 const crypto = require('crypto');
 require('dotenv').config();
 
+
+const { auth_voir_admin,auth_changer_authLevel, auth_supprimer_admin } = require('./config.json');
+
+
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -97,14 +101,14 @@ app.get('/admin', async (req, res) => {
   // Vérifiez les informations d'identification dans la base de données
   const usernameNormalized = req.session.utilisateur.username.toLowerCase();
 
-  if ( auth > 0 )
+  if ( auth >= auth_voir_admin )
  {
       log("[ADMIN] " + usernameNormalized + " a accéder à /admin");
       
       const admins = await getAdmins()
       console.log("admin="+admins)
 
-      res.render('admin', { admins });
+      res.render('admin', { admins, auth_changer_authLevel, auth_supprimer_admin });
       
   } else {
     if (req.session.utilisateur) {
@@ -180,11 +184,11 @@ app.post('/deleteAdmin', async (req, res) => {
  
 
 
-        if ( auth > 1 )
+        if ( auth >= auth_supprimer_admin )
         {
           
           usernameAdminToDelete = usernameAdminToDelete.toLowerCase();
-          const collection = db.collection('admin');
+          const collection = db.collection('utilisateurs');
           const result = await collection.updateOne(
             { username : usernameAdminToDelete },
             { $set: { authLevel: 0 } }
