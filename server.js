@@ -237,7 +237,8 @@ app.post('/authAdmin', async (req, res) => {
   const ut = await chercherUtilisateur(usernameToChangeAuthLevel)
   if (!ut) 
   {
-    res.redirect('/admin', { erreur: 'Cet utilisateur n\'existe pas' })
+    req.session.erreurMessage = 'Cet utilisateur n\'existe pas';
+    res.redirect('/admin');
   }
   const authLevel = parseInt(authVal);
   usernameToChangeAuthLevel = usernameToChangeAuthLevel.toLowerCase();
