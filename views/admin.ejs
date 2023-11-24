@@ -39,11 +39,12 @@
               <option value="3" <%= user.authLevel === 3 ? 'selected' : '' %>>3</option>
               <option value="3" <%= user.authLevel === 3 ? 'selected' : '' %>>4</option>
             </select>
+            <input type="hidden" name="usernameToChangeAuthLevel" value="<%= user.username %>">
             <% } else{  %>
               <%= user.authLevel %>
             <% } %>
           </th>
-          <input type="hidden" name="usernameToChangeAuthLevel" value="<%= user.username %>">
+          
           <% if(current_authLevel >= auth_supprimer_admin && user.authLevel<100 ){  %></100>
           <th>
             
