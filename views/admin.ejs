@@ -7,6 +7,9 @@
   <title>Admin</title>
 </head>
 <body>
+  <% if (erreur) { %>
+    <p style="color: red;"><%= erreur %></p>
+  <% } %>
   <h1>Liste des admin</h1>
   <table border="1">
     <thead>

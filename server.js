@@ -229,9 +229,13 @@ app.post('/authAdmin', async (req, res) => {
     log(`[INTRU] ${usernameNormalized} a tenté de supprimer un admin sans spécifier de auth (/authAdmin))`);
     return;
   }
-  if(!usernameToChangeAuthLevel) {
+  if(!usernameToChangeAuthLevel  ) {
     log(`[INTRU] ${usernameNormalized} a tenté de supprimer un admin sans spécifier de nom (/authAdmin))`);
     return;
+  }
+  else if (!chercherUtilisateur(usernameToChangeAuthLevel)) 
+  {
+    res.redirect('/admin', { erreur: 'Cet utilisateur n\'existe pas' })
   }
   const authLevel = parseInt(authVal);
   usernameToChangeAuthLevel = usernameToChangeAuthLevel.toLowerCase();
