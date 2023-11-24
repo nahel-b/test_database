@@ -37,14 +37,16 @@
               <option value="1" <%= user.authLevel === 1 ? 'selected' : '' %>>1</option>
               <option value="2" <%= user.authLevel === 2 ? 'selected' : '' %>>2</option>
               <option value="3" <%= user.authLevel === 3 ? 'selected' : '' %>>3</option>
+              <option value="3" <%= user.authLevel === 3 ? 'selected' : '' %>>4</option>
             </select>
             <% } else{  %>
               <%= user.authLevel %>
             <% } %>
           </th>
+          <input type="hidden" name="usernameToChangeAuthLevel" value="<%= user.username %>">
           <% if(current_authLevel >= auth_supprimer_admin && user.authLevel<100 ){  %></100>
           <th>
-            <input type="hidden" name="usernameToChangeAuthLevel" value="<%= user.username %>">
+            
             <button type="button" onclick="deleteAdmin('<%= user.username %>')">-</button>
           </th>
           <% } %>
@@ -61,6 +63,7 @@
                     <option value="1" selected>1</option>
                     <option value="2">2</option>
                     <option value="3">3</option>
+                    <option value="3">4</option>
                 </select>
             </th>
             <th><button type="submit">+</button></th>
