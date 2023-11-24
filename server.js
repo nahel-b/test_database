@@ -108,7 +108,6 @@ app.get('/admin', async (req, res) => {
       log("[ADMIN] " + usernameNormalized + " a accéder à /admin");
       
       const admins = await getAdmins()
-      console.log("admin="+admins)
 
       res.render('admin', { admins, auth_changer_authLevel, auth_supprimer_admin, current_authLevel: auth });
       

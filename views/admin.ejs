@@ -49,15 +49,19 @@
       </form>
     <% } %>
     <tr>
-      <th><input type="text" placeholder="username"></th>
-      
-      
-      <th><select id="authVal">
-          <option value="1" selected >1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-        </select></th>
-        <th><button>+</button></th>
+      <form action="/authAdmin" method="post" name="modifierValeurForm">
+        <tr>
+            <th><input type="text" name="usernameToChangeAuthLevel" placeholder="username"></th>
+            <th>
+                <select name="authVal">
+                    <option value="1" selected>1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                </select>
+            </th>
+            <th><button type="submit">+</button></th>
+        </tr>
+    </form>
   </tr>
   
   </table>
