@@ -162,6 +162,53 @@ app.post('/addAdmin', async (req, res) => {
 
 });
 
+app.post('/deleteAdmin', async (req, res) => {
+
+  
+
+
+  const auth = await verifAuthLevel(req,res,"admin")
+
+      if (req.session.utilisateur) {
+      
+      const usernameNormalized = req.session.utilisateur.username.toLowerCase();
+      let { usernameAdminToDelete } = req.body;
+      if (!usernameAdminToDelete) {
+        log(`[INTRU] ${usernameNormalized} a tenté de supprimer un admin sans spécifier de nom`);
+        return;
+      }
+ 
+
+
+        if ( auth > 1 )
+        {
+          
+          usernameAdminToDelete = usernameAdminToDelete.toLowerCase();
+          const collection = db.collection('admin');
+          const result = await collection.updateOne(
+            { username : usernameAdminToDelete },
+            { $set: { authLevel: 0 } }
+          );
+
+          if (result.modifiedCount > 0) {
+            log(`[ADMIN] ${usernameNormalized} a mis à jour l'authLevel de ${usernameAdminToDelete} à 0`);
+            res.redirect('/admin'); // Redirigez après la mise à jour
+          } else {
+            log(`[ERREUR] L'authLevel de l'admin ${usernameAdminToDelete} n'a pas pu être mis à jour`);
+            res.status(500).send('Erreur serveur');
+          }
+    } else 
+    {
+      log(`[INTRU] ${usernameNormalized} a tenté de supprimer un admin (${usernameAdminToDelete} ) sans autorisation`);
+      res.status(403).send('Accès interdit'); // 403 Forbidden
+    }
+  } else {
+    res.redirect('/login');
+  }
+});
+
+
+
 
 app.post('/modifierValeur', (req, res) => {
   const nomFormulaire = req.body.formulaireName;

@@ -26,15 +26,17 @@
           <th><%= user.username %></th>
           <th>
             <select name="authVal">
+              <% if(user.authLevel <= 3 ){  %>
               <option value="1" <%= user.authLevel === 1 ? 'selected' : '' %>>1</option>
               <option value="2" <%= user.authLevel === 2 ? 'selected' : '' %>>2</option>
               <option value="3" <%= user.authLevel === 3 ? 'selected' : '' %>>3</option>
-              <option value="100" <%= user.authLevel === 100 ? 'selected' : '' %>>3</option>
+              <% } else{  %>
+              
+              <% } %>
             </select>
           </th>
           <th>
-            <button type="submit">+</button>
-            <button type="button" onclick="deleteUser('<%= user.username %>')">-</button>
+            <button type="button" onclick="deleteAdmin('<%= user.username %>')">-</button>
           </th>
         </tr>
       </form>
@@ -54,16 +56,16 @@
   </table>
     
   <script>
-    function deleteUser(username) {
-      if (confirm(`Voulez-vous vraiment supprimer l'utilisateur ${username} ?`)) {
+    function deleteAdmin(username) {
+      if (confirm(`Voulez-vous vraiment supprimer l'admin ${username} ?`)) {
         const form = document.createElement('form');
         form.method = 'POST';
-        form.action = '/deleteUser';
+        form.action = '/deleteAdmin';
         form.style.display = 'none';
   
         const input = document.createElement('input');
         input.type = 'text';
-        input.name = 'username';
+        input.name = 'usernameAdminToDelete';
         input.value = username;
         form.appendChild(input);
   
