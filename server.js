@@ -168,9 +168,6 @@ app.post('/addAdmin', async (req, res) => {
 
 app.post('/deleteAdmin', async (req, res) => {
 
-  
-
-
   const auth = await verifAuthLevel(req,res,"admin")
 
       if (req.session.utilisateur) {
@@ -212,14 +209,7 @@ app.post('/deleteAdmin', async (req, res) => {
 });
 
 
-
-
-app.post('/modifierValeur', (req, res) => {
-  const nomFormulaire = req.body.formulaireName;
-  const nouvelleValeur = req.body.authVal;
-
-  res.send('=' + nomFormulaire + "-" + nouvelleValeur);
-});
+//app.post('/changeAuthLevel', async (req, res) => {
 
 
 // Route pour la page d'inscription
@@ -279,7 +269,7 @@ async function verifAuthLevel(req,res,str = "?")
     if ( utilisateur.session_id === req.session.utilisateur.session_id )
    {
   
-        log("[ADMIN] " + usernameNormalized + " a accéder à /admin");
+       
   
         return authLevel;
         

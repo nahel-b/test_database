@@ -1,5 +1,5 @@
 {
-    "auth_voirAdmin": 1,
+    "auth_voir_admin": 1,
     "auth_changer_authLevel": 2,
     "auth_supprimer_admin": 3
   }
