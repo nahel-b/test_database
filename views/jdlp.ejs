@@ -14,19 +14,32 @@
             position: absolute;
             width: 100vw;
             height: 100vh;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #game-zone {
+            width: calc(100vh * 9 / 16);
+            height: 100vh;
+            background-color: #ccc;
+            overflow: hidden;
         }
     </style>
     <title>Secret</title>
 </head>
 <body>
-    <div id="canvas-container"></div>
+    <div id="canvas-container">
+        <div id="game-zone"></div>
+    </div>
 
     <script>
         const { Engine, Render, Bodies, World } = Matter;
 
         const engine = Engine.create();
         const render = Render.create({
-            element: document.getElementById('canvas-container'),
+            element: document.getElementById('game-zone'),
             engine: engine,
             options: {
                 width: window.innerWidth,
@@ -49,7 +62,8 @@
             const ball = Bodies.circle(
                 event.clientX,
                 50,
-                20
+                20,
+                { restitution: 1.0 } // Restitution à 1.0 pour rendre la boule dure
             );
             World.add(engine.world, [ball]);
         });
@@ -59,12 +73,12 @@
             const ball = Bodies.circle(
                 touch.clientX,
                 50,
-                20
+                20,
+                { restitution: 1.0 }
             );
             World.add(engine.world, [ball]);
         });
 
-        // Ajustement des limites
         const leftWall = Bodies.rectangle(0, window.innerHeight / 2, 20, window.innerHeight, { isStatic: true });
         const rightWall = Bodies.rectangle(window.innerWidth, window.innerHeight / 2, 20, window.innerHeight, { isStatic: true });
         const bottomWall = Bodies.rectangle(window.innerWidth / 2, window.innerHeight, window.innerWidth, 20, { isStatic: true });
