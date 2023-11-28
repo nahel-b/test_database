@@ -288,6 +288,10 @@ app.get('/fb', (req, res) =>
 {
   res.render('test_flappy_bird');
 });
+app.get('/jdlp', (req, res) => 
+{
+  res.render('jdlp');
+});
 
 // Route pour gérer l'inscription
 app.post('/signup',limiter, async (req, res) => {
@@ -336,7 +340,6 @@ async function verifAuthLevel(req,res,str = "?")
     if ( utilisateur.session_id === req.session.utilisateur.session_id )
    {
   
-       
   
         return authLevel;
         
