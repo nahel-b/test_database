@@ -281,7 +281,8 @@ res.redirect('/login');
 
 // Route pour la page d'inscription
 app.get('/signup', (req, res) => {
-  res.render('signup', { erreur: null });
+  res.render('<h1>Creation de compte impossible, contacter nahel</h1>')
+  //res.render('signup', { erreur: null });
 });
 
 app.get('/fb', (req, res) => 
@@ -295,6 +296,7 @@ app.get('/jdlp', (req, res) =>
 
 // Route pour gérer l'inscription
 app.post('/signup',limiter, async (req, res) => {
+  
   const { username, password,nom, prenom } = req.body;
 
 
