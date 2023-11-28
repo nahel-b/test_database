@@ -58,23 +58,34 @@
 
         World.add(engine.world, [ground]);
 
+        // Ajustement des coordonnées du clic/touché
+        const adjustCoordinates = (event) => {
+            const rect = document.getElementById('game-zone').getBoundingClientRect();
+            return {
+                x: event.clientX - rect.left,
+                y: event.clientY - rect.top
+            };
+        };
+
         document.addEventListener('click', (event) => {
+            const adjustedCoords = adjustCoordinates(event);
             const ball = Bodies.circle(
-                event.clientX,
-                50,
+                adjustedCoords.x,
+                adjustedCoords.y,
                 20,
-                { restitution: 1.0 } // Restitution à 1.0 pour rendre la boule dure
+                { restitution: 0.0 } // Ajustement pour que les boules ne rebondissent pas
             );
             World.add(engine.world, [ball]);
         });
 
         document.addEventListener('touchstart', (event) => {
             const touch = event.touches[0];
+            const adjustedCoords = adjustCoordinates(touch);
             const ball = Bodies.circle(
-                touch.clientX,
-                50,
+                adjustedCoords.x,
+                adjustedCoords.y,
                 20,
-                { restitution: 1.0 }
+                { restitution: 0.0 } // Ajustement pour que les boules ne rebondissent pas
             );
             World.add(engine.world, [ball]);
         });
