@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.jsdelivr.net/npm/matter-js@0.18.0/build/matter.min.js"></script>
+    <script src="node_modules/matter-js/build/matter.min.js"></script>
     <style>
         body {
             margin: 0;
@@ -22,22 +22,20 @@
     <div id="canvas-container"></div>
 
     <script>
-        // Création du moteur de rendu
-        const engine = Matter.Engine.create();
+        const { Engine, Render, Bodies, World } = Matter;
 
-        // Création du rendu
-        const render = Matter.Render.create({
+        const engine = Engine.create();
+        const render = Render.create({
             element: document.getElementById('canvas-container'),
             engine: engine,
             options: {
                 width: window.innerWidth,
                 height: window.innerHeight,
-                wireframes: false // Pour afficher des formes solides au lieu de formes filaires
+                wireframes: false
             }
         });
 
-        // Création du rectangle comme sol statique
-        const ground = Matter.Bodies.rectangle(
+        const ground = Bodies.rectangle(
             window.innerWidth / 2,
             window.innerHeight - 20,
             window.innerWidth,
@@ -45,38 +43,65 @@
             { isStatic: true }
         );
 
-        // Ajout du rectangle au monde
-        Matter.World.add(engine.world, [ground]);
+        World.add(engine.world, [ground]);
 
-        // Fonction pour créer une boule
-        function createBall(x, y) {
-            const ball = Matter.Bodies.circle(x, y, 20);
-            Matter.World.add(engine.world, [ball]);
-        }
-
-        // Écouteur d'événement pour créer une boule au clic de souris
         document.addEventListener('click', (event) => {
-            createBall(event.clientX, event.clientY);
+            const ball = Bodies.circle(
+                event.clientX,
+                event.clientY,
+                20
+            );
+            World.add(engine.world, [ball]);
         });
 
-        // Écouteur d'événement pour créer une boule au toucher sur écran
         document.addEventListener('touchstart', (event) => {
             const touch = event.touches[0];
-            createBall(touch.clientX, touch.clientY);
+            const ball = Bodies.circle(
+                touch.clientX,
+                touch.clientY,
+                20
+            );
+            World.add(engine.world, [ball]);
         });
 
-        // Écouteur d'événement pour ajuster la taille du rendu lors du redimensionnement de la fenêtre
+        // Ajout de barrières pour les côtés du rectangle
+        const leftWall = Bodies.rectangle(0, window.innerHeight / 2, 20, window.innerHeight, { isStatic: true });
+        const rightWall = Bodies.rectangle(window.innerWidth, window.innerHeight / 2, 20, window.innerHeight, { isStatic: true });
+
+        World.add(engine.world, [leftWall, rightWall]);
+
+        // Correction pour empêcher deux boules d'apparaître sur mobile
+        engine.world.gravity.y = 0;
+
+        // Ajustement de la taille du rendu lors du redimensionnement
         window.addEventListener('resize', () => {
-            Matter.Render.setPixelRatio(render, window.devicePixelRatio);
+            Render.canvas.width = window.innerWidth;
+            Render.canvas.height = window.innerHeight;
+            Render.options.width = window.innerWidth;
+            Render.options.height = window.innerHeight;
+
+            Matter.Bounds.update(engine.world.bounds, {
+                min: { x: 0, y: 0 },
+                max: { x: window.innerWidth, y: window.innerHeight }
+            });
+
+            if (engine.render.canvas) {
+                engine.render.canvas.width = engine.render.options.width;
+                engine.render.canvas.height = engine.render.options.height;
+            }
+            if (engine.render.context) {
+                engine.render.context.width = engine.render.options.width;
+                engine.render.context.height = engine.render.options.height;
+            }
+
             Matter.Render.lookAt(render, {
                 min: { x: 0, y: 0 },
                 max: { x: window.innerWidth, y: window.innerHeight }
             });
         });
 
-        // Exécution du moteur
-        Matter.Engine.run(engine);
-        Matter.Render.run(render);
+        Engine.run(engine);
+        Render.run(render);
     </script>
 </body>
 </html>
