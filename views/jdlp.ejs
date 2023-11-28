@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="path/to/matter.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/matter-js@0.18.0/build/matter.min.js"></script>
     <style>
         body {
             margin: 0;
@@ -48,14 +48,21 @@
         // Ajout du rectangle au monde
         Matter.World.add(engine.world, [ground]);
 
-        // Écouteur d'événement pour créer une boule au clic
-        document.addEventListener('click', (event) => {
-            const ball = Matter.Bodies.circle(
-                event.clientX,
-                event.clientY,
-                20
-            );
+        // Fonction pour créer une boule
+        function createBall(x, y) {
+            const ball = Matter.Bodies.circle(x, y, 20);
             Matter.World.add(engine.world, [ball]);
+        }
+
+        // Écouteur d'événement pour créer une boule au clic de souris
+        document.addEventListener('click', (event) => {
+            createBall(event.clientX, event.clientY);
+        });
+
+        // Écouteur d'événement pour créer une boule au toucher sur écran
+        document.addEventListener('touchstart', (event) => {
+            const touch = event.touches[0];
+            createBall(touch.clientX, touch.clientY);
         });
 
         // Écouteur d'événement pour ajuster la taille du rendu lors du redimensionnement de la fenêtre
