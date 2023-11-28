@@ -3,23 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="path/to/matter.js"></script>
     <style>
         body {
             margin: 0;
-            padding: 0;
             overflow: hidden;
         }
 
-        #rectangle {
-            width: 56.25vh; /* 9:16 aspect ratio */
+        #canvas-container {
+            position: absolute;
+            width: 100vw;
             height: 100vh;
-            background-color: #3498db; /* couleur de fond du rectangle */
-            margin: 0;
         }
     </style>
-    <title>Rectangle Responsive</title>
+    <title>Physics Simulation</title>
 </head>
 <body>
-    <div id="rectangle"></div>
+    <div id="canvas-container"></div>
+
+    <script>
+        // Création du moteur de rendu
+        const engine = Matter.Engine.create();
+
+        // Création du rendu
+        const render = Matter.Render.create({
+            element: document.getElementById('canvas-container'),
+            engine: engine,
+            options: {
+                width: window.innerWidth,
+                height: window.innerHeight,
+                wireframes: false // Pour afficher des formes solides au lieu de formes filaires
+            }
+        });
+
+        // Création du rectangle comme sol statique
+        const ground = Matter.Bodies.rectangle(
+            window.innerWidth / 2,
+            window.innerHeight - 20,
+            window.innerWidth,
+            40,
+            { isStatic: true }
+        );
+
+        // Ajout du rectangle au monde
+        Matter.World.add(engine.world, [ground]);
+
+        // Écouteur d'événement pour créer une boule au clic
+        document.addEventListener('click', (event) => {
+            const ball = Matter.Bodies.circle(
+                event.clientX,
+                event.clientY,
+                20
+            );
+            Matter.World.add(engine.world, [ball]);
+        });
+
+        // Écouteur d'événement pour ajuster la taille du rendu lors du redimensionnement de la fenêtre
+        window.addEventListener('resize', () => {
+            Matter.Render.setPixelRatio(render, window.devicePixelRatio);
+            Matter.Render.lookAt(render, {
+                min: { x: 0, y: 0 },
+                max: { x: window.innerWidth, y: window.innerHeight }
+            });
+        });
+
+        // Exécution du moteur
+        Matter.Engine.run(engine);
+        Matter.Render.run(render);
+    </script>
 </body>
 </html>
