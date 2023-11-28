@@ -16,7 +16,7 @@
             height: 100vh;
         }
     </style>
-    <title>Physics Simulation</title>
+    <title>Secret</title>
 </head>
 <body>
     <div id="canvas-container"></div>
@@ -48,7 +48,7 @@
         document.addEventListener('click', (event) => {
             const ball = Bodies.circle(
                 event.clientX,
-                50, // Ajuster la hauteur ici pour qu'elle soit au-dessus du haut de l'écran
+                50,
                 20
             );
             World.add(engine.world, [ball]);
@@ -58,18 +58,20 @@
             const touch = event.touches[0];
             const ball = Bodies.circle(
                 touch.clientX,
-                50, // Ajuster la hauteur ici pour qu'elle soit au-dessus du haut de l'écran
+                50,
                 20
             );
             World.add(engine.world, [ball]);
         });
 
+        // Ajustement des limites
         const leftWall = Bodies.rectangle(0, window.innerHeight / 2, 20, window.innerHeight, { isStatic: true });
         const rightWall = Bodies.rectangle(window.innerWidth, window.innerHeight / 2, 20, window.innerHeight, { isStatic: true });
+        const bottomWall = Bodies.rectangle(window.innerWidth / 2, window.innerHeight, window.innerWidth, 20, { isStatic: true });
 
-        World.add(engine.world, [leftWall, rightWall]);
+        World.add(engine.world, [leftWall, rightWall, bottomWall]);
 
-        engine.world.gravity.y = 0;
+        engine.world.gravity.y = 1;
 
         window.addEventListener('resize', () => {
             Render.canvas.width = window.innerWidth;
