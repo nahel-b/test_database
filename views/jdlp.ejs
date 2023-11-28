@@ -48,7 +48,7 @@
         document.addEventListener('click', (event) => {
             const ball = Bodies.circle(
                 event.clientX,
-                event.clientY,
+                50, // Ajuster la hauteur ici pour qu'elle soit au-dessus du haut de l'écran
                 20
             );
             World.add(engine.world, [ball]);
@@ -58,22 +58,19 @@
             const touch = event.touches[0];
             const ball = Bodies.circle(
                 touch.clientX,
-                touch.clientY,
+                50, // Ajuster la hauteur ici pour qu'elle soit au-dessus du haut de l'écran
                 20
             );
             World.add(engine.world, [ball]);
         });
 
-        // Ajout de barrières pour les côtés du rectangle
         const leftWall = Bodies.rectangle(0, window.innerHeight / 2, 20, window.innerHeight, { isStatic: true });
         const rightWall = Bodies.rectangle(window.innerWidth, window.innerHeight / 2, 20, window.innerHeight, { isStatic: true });
 
         World.add(engine.world, [leftWall, rightWall]);
 
-        // Correction pour empêcher deux boules d'apparaître sur mobile
         engine.world.gravity.y = 0;
 
-        // Ajustement de la taille du rendu lors du redimensionnement
         window.addEventListener('resize', () => {
             Render.canvas.width = window.innerWidth;
             Render.canvas.height = window.innerHeight;
