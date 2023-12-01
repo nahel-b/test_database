@@ -281,8 +281,8 @@ res.redirect('/login');
 
 // Route pour la page d'inscription
 app.get('/signup', (req, res) => {
-  res.render('<h1>Creation de compte impossible, contacter nahel</h1>')
-  //res.render('signup', { erreur: null });
+  //res.render('<h1>Creation de compte impossible, contacter nahel</h1>')
+  res.render('signup', { erreur: null });
 });
 
 app.get('/fb', (req, res) => 
